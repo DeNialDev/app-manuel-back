@@ -16,7 +16,9 @@ class AuthController extends Controller
         if ($user) {
             $token = $user->createToken('auth_token')->accessToken;
 
-            return ['access_token' => $token, 'user' => $user];
+            $roles = $user->getRoleNames();
+
+            return ['access_token' => $token, 'user' => $user, 'roles' => $roles];
         }
 
     }
