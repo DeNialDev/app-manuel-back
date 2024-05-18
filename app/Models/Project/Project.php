@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Project;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
-    use HasFactory;
+    use HasFactory, ProjectAccessors, ProjectRelationships;
 
     /**
      * The attributes that are mass assignable.

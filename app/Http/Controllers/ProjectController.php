@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Project;
+use App\Models\Project\Project;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -13,18 +13,30 @@ class ProjectController extends Controller
      */
     public function index()
     {
+        // Suponiendo que recibes el ID del usuario como un parámetro de consulta
+        $userId = request()->query('user_id');
+
+        // Filtra los proyectos por el ID del usuario
+        $projectsQuery = Project::where('user_id', $userId);
+
         $columns = request()->query('columns');
-        $projects = Project::all();
         if ($columns) {
-            $projects = $projects->map(function ($loan) use ($columns) {
-                $filteredBook = collect();
+            // Decode the JSON string to an array
+            $columns = json_decode($columns, true);
+
+            // Retrieve only the specified columns
+            $projects = $projectsQuery->get($columns)->map(function ($project) use ($columns) {
+                $filteredProject = collect();
 
                 foreach ($columns as $column) {
-                    $filteredBook[$column] = $loan->{$column};
+                    $filteredProject[$column] = $project->{$column};
                 }
 
-                return $filteredBook;
+                return $filteredProject;
             });
+        } else {
+            // If no columns specified, retrieve all columns
+            $projects = $projectsQuery->get();
         }
 
         return response()->json($projects);
@@ -40,6 +52,7 @@ class ProjectController extends Controller
             'description' => 'required|string|max:255',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
+            'user_id' => 'required',
         ];
 
         $messages = [
@@ -73,7 +86,12 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        return response()->json($project);
+        $columns = request()->has('columns') ? json_decode(request('columns')) : ['id'];
+
+        return response()->json(
+            $project->only($columns),
+            200
+        );
     }
 
     /**
