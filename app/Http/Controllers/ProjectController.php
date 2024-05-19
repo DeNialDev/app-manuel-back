@@ -52,7 +52,7 @@ class ProjectController extends Controller
             'description' => 'required|string|max:255',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'user_id' => 'required',
+            'user_id' => 'required|exists:users,id',  // Validación adicional para asegurar que el user_id exista en la tabla users
         ];
 
         $messages = [
@@ -67,11 +67,11 @@ class ProjectController extends Controller
             'end_date.required' => 'La fecha de fin es obligatoria.',
             'end_date.date' => 'La fecha de fin debe ser una fecha válida.',
             'end_date.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
-
+            'user_id.required' => 'El usuario es obligatorio.',
+            'user_id.exists' => 'El usuario seleccionado no es válido.',  // Mensaje personalizado para la validación de exists
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
-
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }

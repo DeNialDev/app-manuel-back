@@ -29,7 +29,7 @@ class TaskController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'status' => 'required|in:Nueva,En proceso,Terminada',
-            'project_id' => 'required',
+            'project_id' => 'required|exists:projects,id',
         ];
 
         $messages = [
@@ -46,6 +46,8 @@ class TaskController extends Controller
             'end_date.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
             'status.required' => 'El estado es obligatorio.',
             'status.in' => 'El estado debe ser uno de los siguientes: Nueva, En proceso, Terminada.',
+            'project_id.required' => 'El proyecto es obligatorio.',
+            'project_id.exists' => 'El proyecto seleccionado no es válido.',
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
